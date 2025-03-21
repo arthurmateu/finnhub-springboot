@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: finnhub-db
+    restart: always
+    environment:
+      POSTGRES_USER: finnhub_user
+      POSTGRES_PASSWORD: finnhub_password
+      POSTGRES_DB: finnhub_db
+    ports:
+      - "5432:5432"
+    networks:
+      - finnhub-network
+
+  app:
+    build: .
+    container_name: finnhub-app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/finnhub_db
+      SPRING_DATASOURCE_USERNAME: finnhub_user
+      SPRING_DATASOURCE_PASSWORD: finnhub_password
+    networks:
+      - finnhub-network
+
+networks:
+  finnhub-network:
+    driver: bridge
