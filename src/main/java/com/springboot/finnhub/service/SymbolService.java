@@ -4,6 +4,7 @@ import com.springboot.finnhub.feign.FinnhubClient;
 import com.springboot.finnhub.model.Symbol;
 import com.springboot.finnhub.repository.SymbolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -6,23 +6,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.DynamicPropertyRegistry;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
-        "spring.datasource.username=sa",
-        "spring.datasource.password=",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
-})
+@Testcontainers
 @Transactional
+@ActiveProfiles("test")
 class FinnhubRepositoryTests {
+
+    @Container
+    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void overrideProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", postgresContainer::getDriverClassName);
+    }
 
     @Autowired
     private SymbolRepository repository;
@@ -58,7 +72,6 @@ class FinnhubRepositoryTests {
         repository.save(anotherSymbol);
 
         List<Symbol> symbols = repository.findAll();
-        // NOTE: this seems to fail because it's not actually creating everything on the H2 db. Will check later
         assertThat(symbols).hasSize(2);
     }
 

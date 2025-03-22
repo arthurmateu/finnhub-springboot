@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
@@ -30,11 +31,12 @@ public class PopulateDatabase {
     private String finnhubExchange;
 
     @Bean
+    @Profile("!test") // To avoid populating during testing
     public Object populateDatabaseIfEmpty() {
         if (symbolRepository.count() == 0) {
             List<Symbol> symbols = finnhubClient.populateDatabase(finnhubExchange, finnhubApiToken);
             symbolService.populateDatabase(symbols);
         }
-        return new Object();
+        return new Object(); // Beans can't be void
     }
 }
