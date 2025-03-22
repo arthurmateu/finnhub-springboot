@@ -2,9 +2,10 @@ package com.springboot.finnhub.service;
 
 import com.springboot.finnhub.feign.FinnhubClient;
 import com.springboot.finnhub.model.Symbol;
+import com.springboot.finnhub.model.SymbolSpecification;
 import com.springboot.finnhub.repository.SymbolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,18 @@ public class SymbolService {
         return repository.findById(id);
     }
 
+    public List<Symbol> readFiltered(
+            String currency, String description, String displaySymbol,
+            String figi, String isin, String mic, String shareClassFIGI,
+            String symbol, String symbol2, String type) {
+
+        Specification<Symbol> spec = SymbolSpecification.filterBy(
+                currency, description, displaySymbol, figi, isin, mic,
+                shareClassFIGI, symbol, symbol2, type);
+
+        return repository.findAll(spec);
+    }
+
     // Update
     public Symbol updateSymbol(Symbol symbol, Integer id) {
 
@@ -54,9 +67,7 @@ public class SymbolService {
                     s.setType(symbol.getType());
                     return repository.save(s);
                 })
-                .orElseGet(() -> {
-                    return repository.save(symbol);
-                });
+                .orElseGet(() -> repository.save(symbol));
     }
 
     // Delete

@@ -25,6 +25,23 @@ public class SymbolController {
         return service.read(id);
     }
 
+
+    @GetMapping("/filter")
+    public List<Symbol> readFilteredSymbol(
+            @RequestParam(required = false) String currency,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String displaySymbol,
+            @RequestParam(required = false) String figi,
+            @RequestParam(required = false) String isin,
+            @RequestParam(required = false) String mic,
+            @RequestParam(required = false) String shareClassFIGI,
+            @RequestParam(required = false) String symbol,
+            @RequestParam(required = false) String symbol2,
+            @RequestParam(required = false) String type) {
+
+        return service.readFiltered(currency, description, displaySymbol, figi, isin, mic, shareClassFIGI, symbol, symbol2, type);
+    }
+
     @PostMapping
     public Symbol createSymbol(@RequestBody Symbol symbol) {
         return service.create(symbol);
