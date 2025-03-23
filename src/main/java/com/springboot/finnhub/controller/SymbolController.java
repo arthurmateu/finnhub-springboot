@@ -3,31 +3,31 @@ package com.springboot.finnhub.controller;
 import com.springboot.finnhub.model.Symbol;
 import com.springboot.finnhub.service.SymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/symbol") // To avoid repeating on each mapping
+@RequestMapping("/symbol")
 public class SymbolController {
 
     @Autowired
     private SymbolService service;
 
-    @GetMapping
-    public List<Symbol> readAllSymbol(@PathVariable(value = "numberValue", required = false) Integer id) {
-        return service.readAll();
+    @GetMapping("/all")
+    public Page<Symbol> readAllSymbol(Pageable pageable) {
+        return service.readAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public Optional<Symbol> readSymbol(@PathVariable(value = "numberValue", required = false) Integer id) {
+    public Optional<Symbol> readSymbol(@PathVariable(value = "numberValue") Integer id) {
         return service.read(id);
     }
 
-
     @GetMapping("/filter")
-    public List<Symbol> readFilteredSymbol(
+    public Page<Symbol> readFilteredSymbol(
             @RequestParam(required = false) String currency,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) String displaySymbol,
@@ -37,9 +37,10 @@ public class SymbolController {
             @RequestParam(required = false) String shareClassFIGI,
             @RequestParam(required = false) String symbol,
             @RequestParam(required = false) String symbol2,
-            @RequestParam(required = false) String type) {
+            @RequestParam(required = false) String type,
+            Pageable pageable) {
 
-        return service.readFiltered(currency, description, displaySymbol, figi, isin, mic, shareClassFIGI, symbol, symbol2, type);
+        return service.readFiltered(currency, description, displaySymbol, figi, isin, mic, shareClassFIGI, symbol, symbol2, type, pageable);
     }
 
     @PostMapping

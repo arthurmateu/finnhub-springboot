@@ -5,11 +5,13 @@ import com.springboot.finnhub.model.Symbol;
 import com.springboot.finnhub.model.SymbolSpecification;
 import com.springboot.finnhub.repository.SymbolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class SymbolService {
@@ -30,24 +32,24 @@ public class SymbolService {
     }
 
     // Read
-    public List<Symbol> readAll() {
-        return repository.findAll();
+    public Page<Symbol> readAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     public Optional<Symbol> read(Integer id) {
         return repository.findById(id);
     }
 
-    public List<Symbol> readFiltered(
+    public Page<Symbol> readFiltered(
             String currency, String description, String displaySymbol,
             String figi, String isin, String mic, String shareClassFIGI,
-            String symbol, String symbol2, String type) {
+            String symbol, String symbol2, String type, Pageable pageable) {
 
         Specification<Symbol> spec = SymbolSpecification.filterBy(
                 currency, description, displaySymbol, figi, isin, mic,
                 shareClassFIGI, symbol, symbol2, type);
 
-        return repository.findAll(spec);
+        return repository.findAll(spec, pageable);
     }
 
     // Update
